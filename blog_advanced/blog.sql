@@ -26,14 +26,14 @@ DROP TABLE IF EXISTS `category`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `category` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `parentId` bigint(20) DEFAULT NULL,
+  `parent_id` bigint(20) DEFAULT NULL,
   `title` varchar(75) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `metaTitle` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meta_title` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `slug` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `content` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
-  KEY `idx_category_parent` (`parentId`),
-  CONSTRAINT `fk_category_parent` FOREIGN KEY (`parentId`) REFERENCES `category` (`id`)
+  KEY `idx_category_parent` (`parent_id`),
+  CONSTRAINT `fk_category_parent` FOREIGN KEY (`parent_id`) REFERENCES `category` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -55,23 +55,23 @@ DROP TABLE IF EXISTS `post`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `post` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `authorId` bigint(20) NOT NULL,
-  `parentId` bigint(20) DEFAULT NULL,
+  `author_id` bigint(20) NOT NULL,
+  `parent_id` bigint(20) DEFAULT NULL,
   `title` varchar(75) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `metaTitle` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meta_title` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `slug` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `summary` tinytext COLLATE utf8mb4_unicode_ci,
   `published` tinyint(1) NOT NULL DEFAULT '0',
-  `createdAt` datetime NOT NULL,
-  `updatedAt` datetime DEFAULT NULL,
-  `publishedAt` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `published_at` datetime DEFAULT NULL,
   `content` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_slug` (`slug`),
-  KEY `idx_post_user` (`authorId`),
-  KEY `idx_post_parent` (`parentId`),
-  CONSTRAINT `fk_post_parent` FOREIGN KEY (`parentId`) REFERENCES `post` (`id`),
-  CONSTRAINT `fk_post_user` FOREIGN KEY (`authorId`) REFERENCES `user` (`id`)
+  KEY `idx_post_user` (`author_id`),
+  KEY `idx_post_parent` (`parent_id`),
+  CONSTRAINT `fk_post_parent` FOREIGN KEY (`parent_id`) REFERENCES `post` (`id`),
+  CONSTRAINT `fk_post_user` FOREIGN KEY (`author_id`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -92,13 +92,13 @@ DROP TABLE IF EXISTS `post_category`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `post_category` (
-  `postId` bigint(20) NOT NULL,
-  `categoryId` bigint(20) NOT NULL,
-  PRIMARY KEY (`postId`,`categoryId`),
-  KEY `idx_pc_category` (`categoryId`),
-  KEY `idx_pc_post` (`postId`) /*!80000 INVISIBLE */,
-  CONSTRAINT `fk_pc_category` FOREIGN KEY (`categoryId`) REFERENCES `category` (`id`),
-  CONSTRAINT `fk_pc_post` FOREIGN KEY (`postId`) REFERENCES `post` (`id`)
+  `post_id` bigint(20) NOT NULL,
+  `category_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`post_id`,`category_id`),
+  KEY `idx_pc_category` (`category_id`),
+  KEY `idx_pc_post` (`post_id`) /*!80000 INVISIBLE */,
+  CONSTRAINT `fk_pc_category` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
+  CONSTRAINT `fk_pc_post` FOREIGN KEY (`post_id`) REFERENCES `post` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -120,18 +120,18 @@ DROP TABLE IF EXISTS `post_comment`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `post_comment` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `postId` bigint(20) NOT NULL,
-  `parentId` bigint(20) DEFAULT NULL,
+  `post_id` bigint(20) NOT NULL,
+  `parent_id` bigint(20) DEFAULT NULL,
   `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `published` tinyint(1) NOT NULL DEFAULT '0',
-  `createdAt` datetime NOT NULL,
-  `publishedAt` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `published_at` datetime DEFAULT NULL,
   `content` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
-  KEY `idx_comment_post` (`postId`) /*!80000 INVISIBLE */,
-  KEY `idx_comment_parent` (`parentId`),
-  CONSTRAINT `fk_comment_parent` FOREIGN KEY (`parentId`) REFERENCES `post_comment` (`id`),
-  CONSTRAINT `fk_comment_post` FOREIGN KEY (`postId`) REFERENCES `post` (`id`)
+  KEY `idx_comment_post` (`post_id`) /*!80000 INVISIBLE */,
+  KEY `idx_comment_parent` (`parent_id`),
+  CONSTRAINT `fk_comment_parent` FOREIGN KEY (`parent_id`) REFERENCES `post_comment` (`id`),
+  CONSTRAINT `fk_comment_post` FOREIGN KEY (`post_id`) REFERENCES `post` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -153,13 +153,13 @@ DROP TABLE IF EXISTS `post_meta`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `post_meta` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `postId` bigint(20) NOT NULL,
+  `post_id` bigint(20) NOT NULL,
   `key` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `content` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_post_meta` (`postId`,`key`) /*!80000 INVISIBLE */,
-  KEY `idx_meta_post` (`postId`),
-  CONSTRAINT `fk_meta_post` FOREIGN KEY (`postId`) REFERENCES `post` (`id`)
+  UNIQUE KEY `uq_post_meta` (`post_id`,`key`) /*!80000 INVISIBLE */,
+  KEY `idx_meta_post` (`post_id`),
+  CONSTRAINT `fk_meta_post` FOREIGN KEY (`post_id`) REFERENCES `post` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -180,13 +180,13 @@ DROP TABLE IF EXISTS `post_tag`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `post_tag` (
-  `postId` bigint(20) NOT NULL,
-  `tagId` bigint(20) NOT NULL,
-  PRIMARY KEY (`postId`,`tagId`),
-  KEY `idx_pt_tag` (`tagId`),
-  KEY `idx_pt_post` (`postId`),
-  CONSTRAINT `fk_pt_post` FOREIGN KEY (`postId`) REFERENCES `post` (`id`),
-  CONSTRAINT `fk_pt_tag` FOREIGN KEY (`tagId`) REFERENCES `tag` (`id`)
+  `post_id` bigint(20) NOT NULL,
+  `tag_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`post_id`,`tag_id`),
+  KEY `idx_pt_tag` (`tag_id`),
+  KEY `idx_pt_post` (`post_id`),
+  CONSTRAINT `fk_pt_post` FOREIGN KEY (`post_id`) REFERENCES `post` (`id`),
+  CONSTRAINT `fk_pt_tag` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -209,7 +209,7 @@ DROP TABLE IF EXISTS `tag`;
 CREATE TABLE `tag` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `title` varchar(75) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `metaTitle` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meta_title` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `slug` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `content` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`)
@@ -234,14 +234,14 @@ DROP TABLE IF EXISTS `user`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `user` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `firstName` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `middleName` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `lastName` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `first_name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `middle_name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `last_name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `mobile` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `passwordHash` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `registeredAt` datetime NOT NULL,
-  `lastLogin` datetime DEFAULT NULL,
+  `password_hash` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `registered_at` datetime NOT NULL,
+  `last_login` datetime DEFAULT NULL,
   `intro` tinytext COLLATE utf8mb4_unicode_ci,
   `profile` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
